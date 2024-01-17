@@ -4,15 +4,14 @@ import { storeToRefs } from 'pinia'
 import { useMemoryStore } from '@/stores/memory'
 
 const memoryStore = useMemoryStore()
-const { cardsData, mistakes, successes } = storeToRefs(memoryStore)
+const { cardsData, mistakes, successes, level } = storeToRefs(memoryStore)
+const { levels} = useMemoryStore()
 
 const cardFliped = ref(0)
 const firstCardFliped = ref(undefined)
 const secondCardFliped = ref(undefined)
-
-console.log(
-  `estado inicial: fliped:${cardFliped.value} - 1st:${firstCardFliped.value} - 2nd:${secondCardFliped.value}`
-)
+const levelSelected = ref({})
+console.log(levels)
 
 watch(successes, () => {
   console.log(successes.value)
@@ -42,7 +41,7 @@ const switchCard = (card) => {
     if (card.id === firstCardFliped.value.id || card.id === secondCardFliped.value.id) {
       console.log('debes clickear otra carta')
     } else {
-      turnReset()
+      // turnReset()
       // set card clicked to visible
       cardFliped.value++
       let choosenCard = cardsData.value.find((c) => c.id === card.id)
@@ -84,6 +83,12 @@ const switchCard = (card) => {
     } else {
       console.log('nones siga participando')
       mistakes.value++
+      setTimeout((e) => {
+        console.log(e)
+        turnReset()
+        console.warn('ejecute turnReset()')
+
+      }, level.value.time)
     }
   }
 }
@@ -114,13 +119,29 @@ const manageSuccess = (firstCard, secondCard) => {
   cardFliped.value = 0
   // TODO logica para acierto
 }
+
+const setDificult = (level) => {
+  console.log(levelSelected.value, level)
+  memoryStore.setLevel(levelSelected.value)
+
+}
+
 onMounted(() => {
   memoryStore.getAllPhotos()
 })
+
+
 </script>
 
 <template>
   <main>
+    <div>
+      <select name="levelSelected" id="" v-model="levelSelected" @change="setDificult">
+        <option v-for="lvl in levels" :key="lvl" :value="lvl">{{ lvl.name }}</option>
+        {{ levels }}
+      </select>
+
+    </div>
     <div class="my-10 ml-12">
       <div>Succeses: {{ successes }}</div>
       <div>Errors: {{ mistakes }}</div>
@@ -133,10 +154,7 @@ onMounted(() => {
             <img src="../assets/img/33777.svg" alt="" width="180px" />
           </div>
         </div>
-        <div
-          class="bg-slate-400 w-full pl-11"
-          v-else-if="card.hasBeenMatched || card.isHidden == false"
-        >
+        <div class="bg-slate-400 w-full pl-11" v-else-if="card.hasBeenMatched || card.isHidden == false">
           <img :src="card.fields.image.url" alt="" class="w-full aspect-square" />
         </div>
         <!-- <div class="bg-slate-400 w-full pl-11" v-else>
