@@ -154,9 +154,5 @@ onMounted(() => {
         </div>
       </div>
     </section>
-    <pre>
-
-      {{ cardsData }}
-    </pre>
   </main>
 </template>
