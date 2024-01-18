@@ -5,7 +5,7 @@ import { useMemoryStore } from '@/stores/memory'
 
 const memoryStore = useMemoryStore()
 const { cardsData, mistakes, successes, level } = storeToRefs(memoryStore)
-const { levels} = useMemoryStore()
+const { levels } = useMemoryStore()
 
 const cardFliped = ref(0)
 const firstCardFliped = ref(undefined)
@@ -134,33 +134,29 @@ onMounted(() => {
 </script>
 
 <template>
+  <header class="text-center my-10 ml-12">
+    <div>Succeses: {{ successes }}</div>
+    <div>Errors: {{ mistakes }}</div>
+    <div>cards: {{ cardFliped }}</div>
+  </header>
   <main>
-    <div>
-      <select name="levelSelected" id="" v-model="levelSelected" @change="setDificult">
-        <option v-for="lvl in levels" :key="lvl" :value="lvl">{{ lvl.name }}</option>
-        {{ levels }}
-      </select>
-
-    </div>
-    <div class="my-10 ml-12">
-      <div>Succeses: {{ successes }}</div>
-      <div>Errors: {{ mistakes }}</div>
-      <div>cards: {{ cardFliped }}</div>
-    </div>
-    <div class="grid grid-cols-6 gap-3">
-      <div v-for="(card, i) in cardsData" :key="i" @click="switchCard(card, i)">
-        <div id="main__hidden" class="w-full" v-if="card.isHidden">
-          <div class="opacity-2">
-            <img src="../assets/img/33777.svg" alt="" width="180px" />
+    <section class="container mx-auto">
+      <div class="grid grid-cols-3 gap-3 sm:grid-cols-3 sm:gap-5 md:grid-cols-6 md:gap-3 lg:grid-cols-6 lg:gap-7">
+        <div v-for="(card, i) in cardsData" :key="i" @click="switchCard(card, i)"
+          class="2xl:size-60 xl:size-40 lg:size-36 md:size-24 sm:size-44 size-44  bg-gradient-to-r from-cyan-500 to-blue-500 ">
+          <div class="flex justify-center mt-8" v-if="card.isHidden" id="card__hidden">
+            <img src="../assets/img/icon_question.svg" alt="" width="110rem" class="text-white" />
+          </div>
+          <div class="h-full w-full " v-else-if="card.hasBeenMatched || card.isHidden == false" id="card__revealed"
+            :class="card.hasBeenMatched ? 'grayscale' : 'grayscale-0'">
+            <img :src="card.fields.image.url" alt="image-card" class="object-cover object-center h-full w-full" />
           </div>
         </div>
-        <div class="bg-slate-400 w-full pl-11" v-else-if="card.hasBeenMatched || card.isHidden == false">
-          <img :src="card.fields.image.url" alt="" class="w-full aspect-square" />
-        </div>
-        <!-- <div class="bg-slate-400 w-full pl-11" v-else>
-          <img :src="card.fields.image.url" alt="" class="w-full aspect-square" />
-        </div> -->
       </div>
-    </div>
+    </section>
+    <pre>
+
+      {{ cardsData }}
+    </pre>
   </main>
 </template>

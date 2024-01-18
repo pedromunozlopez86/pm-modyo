@@ -24,7 +24,7 @@ export const useMemoryStore = defineStore('memory', () => {
     },
     {
       name: 'hard',
-      cards: 12,
+      cards: 9,
       time: 1000
     }
   ]
