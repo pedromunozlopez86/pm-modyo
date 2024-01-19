@@ -1,11 +1,14 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useMemoryStore } from '@/stores/memory'
+import { useUserStore } from '@/stores/user'
 
 const memoryStore = useMemoryStore()
+const userStore = useUserStore()
 const { cardsData, mistakes, successes, level } = storeToRefs(memoryStore)
 const { levels } = useMemoryStore()
+const { name } = storeToRefs(userStore)
 
 const cardFliped = ref(0)
 const firstCardFliped = ref(undefined)
@@ -17,7 +20,7 @@ watch(successes, () => {
   console.log(successes.value)
   if (successes.value === 9) {
     setTimeout(() => {
-      alert('gameover')
+      alert(`Has ganado: ${name.value}!!`)
     }, 500)
     return false
   }
@@ -56,7 +59,6 @@ const switchCard = (card) => {
       let choosenCard = cardsData.value.find((c) => c.id === card.id)
       choosenCard.isHidden = false
       firstCardFliped.value = choosenCard
-      // console.log(`primera carta: ${JSON.stringify(firstCardFliped.value.meta.name) ?? 'GG'}`)
       console.log(
         `estado 2do if: fliped:${cardFliped.value} - 1st:${firstCardFliped.value.meta.name} - 2nd:${secondCardFliped.value?.meta?.name}`
       )
@@ -87,7 +89,6 @@ const switchCard = (card) => {
         console.log(e)
         turnReset()
         console.warn('ejecute turnReset()')
-
       }, level.value.time)
     }
   }
@@ -99,17 +100,17 @@ const compareCards = (firstId, secondId) => {
   } else false
 }
 
-const manageMistake = () => {
-  cardFliped.value = 0
-  firstCardFliped.value = undefined
-  secondCardFliped.value = undefined
-  cardsData.value.forEach((card) => {
-    card.isHidden = true
-  })
-  console.log(
-    `estado turnReset: fliped:${cardFliped.value} - 1st:${firstCardFliped.value} - 2nd:${secondCardFliped.value}`
-  )
-}
+// const manageMistake = () => {
+//   cardFliped.value = 0
+//   firstCardFliped.value = undefined
+//   secondCardFliped.value = undefined
+//   cardsData.value.forEach((card) => {
+//     card.isHidden = true
+//   })
+//   console.log(
+//     `estado turnReset: fliped:${cardFliped.value} - 1st:${firstCardFliped.value} - 2nd:${secondCardFliped.value}`
+//   )
+// }
 
 const manageSuccess = (firstCard, secondCard) => {
   // set cards state as NotHidden
@@ -120,17 +121,17 @@ const manageSuccess = (firstCard, secondCard) => {
   // TODO logica para acierto
 }
 
-const setDificult = (level) => {
-  console.log(levelSelected.value, level)
-  memoryStore.setLevel(levelSelected.value)
+// const setDificult = (level) => {
+//   console.log(levelSelected.value, level)
+//   memoryStore.setLevel(levelSelected.value)
+// }
 
-}
-
+const isGrayScale = computed((condition) => {
+  return condition ? 'grayscale' : 'grayscale-0'
+})
 onMounted(() => {
   memoryStore.getAllPhotos()
 })
-
-
 </script>
 
 <template>
@@ -141,15 +142,29 @@ onMounted(() => {
   </header>
   <main>
     <section class="container mx-auto">
-      <div class="grid grid-cols-3 gap-3 sm:grid-cols-3 sm:gap-5 md:grid-cols-6 md:gap-3 lg:grid-cols-6 lg:gap-7">
-        <div v-for="(card, i) in cardsData" :key="i" @click="switchCard(card, i)"
-          class="2xl:size-60 xl:size-40 lg:size-36 md:size-24 sm:size-44 size-44  bg-gradient-to-r from-cyan-500 to-blue-500 ">
+      <div
+        class="grid grid-cols-3 gap-3 sm:grid-cols-3 sm:gap-5 md:grid-cols-6 md:gap-3 lg:grid-cols-6 lg:gap-7"
+      >
+        <div
+          v-for="(card, i) in cardsData"
+          :key="i"
+          @click="switchCard(card, i)"
+          class="2xl:size-60 xl:size-40 lg:size-36 md:size-24 sm:size-44 size-44 bg-gradient-to-r from-cyan-500 to-blue-500"
+        >
           <div class="flex justify-center mt-8" v-if="card.isHidden" id="card__hidden">
-            <img src="../assets/img/icon_question.svg" alt="" width="110rem" class="text-white" />
+            <img src="../assets/img/icon_question.svg" alt="question-mark" class="text-white w-1/3 pt-0 md:pt-5" />
           </div>
-          <div class="h-full w-full " v-else-if="card.hasBeenMatched || card.isHidden == false" id="card__revealed"
-            :class="card.hasBeenMatched ? 'grayscale' : 'grayscale-0'">
-            <img :src="card.fields.image.url" alt="image-card" class="object-cover object-center h-full w-full" />
+          <div
+            class="h-full w-full"
+            v-else-if="card.hasBeenMatched || card.isHidden == false"
+            id="card__revealed"
+            :class="isGrayScale(card.hasBeenMatched)"
+          >
+            <img
+              :src="card.fields.image.url"
+              alt="image-card"
+              class="object-cover object-center h-full w-full"
+            />
           </div>
         </div>
       </div>

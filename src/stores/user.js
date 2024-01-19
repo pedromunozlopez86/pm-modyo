@@ -5,5 +5,9 @@ export const useUserStore = defineStore('user', () => {
   const name = ref('')
   const dificult = ref({})
 
-  return { name, dificult }
+  const setName = (inputName) => {
+    name.value = inputName
+    console.log('nombre :',inputName)
+  }
+  return { name, dificult,setName }
 })
