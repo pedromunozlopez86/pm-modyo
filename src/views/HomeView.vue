@@ -10,14 +10,14 @@ const { cardsData, mistakes, successes, level } = storeToRefs(memoryStore)
 const { levels } = useMemoryStore()
 const { name } = storeToRefs(userStore)
 
+const isError = ref(false)
+const isSuccess = ref(false)
 const cardFliped = ref(0)
 const firstCardFliped = ref(undefined)
 const secondCardFliped = ref(undefined)
 const levelSelected = ref({})
-console.log(levels)
 
 watch(successes, () => {
-  console.log(successes.value)
   if (successes.value === 9) {
     setTimeout(() => {
       alert(`Has ganado: ${name.value}!!`)
@@ -81,11 +81,17 @@ const switchCard = (card) => {
     if (isMatch) {
       console.log(`YES checo P1: ${isMatch}`)
       successes.value++
-      manageSuccess(firstCardFliped.value, secondCardFliped.value)
+      isSuccess.value = true
+      setTimeout((e) => {
+        isSuccess.value = false
+        manageSuccess(firstCardFliped.value, secondCardFliped.value)
+      }, level.value.time)
     } else {
       console.log('nones siga participando')
       mistakes.value++
+      isError.value = true
       setTimeout((e) => {
+        isError.value = false
         console.log(e)
         turnReset()
         console.warn('ejecute turnReset()')
@@ -118,47 +124,59 @@ const manageSuccess = (firstCard, secondCard) => {
   cardsData.value.find((c) => c.id === secondCard.id).hasBeenMatched = true
   console.log(cardsData.value)
   cardFliped.value = 0
-  // TODO logica para acierto
 }
 
-// const setDificult = (level) => {
-//   console.log(levelSelected.value, level)
-//   memoryStore.setLevel(levelSelected.value)
-// }
-
-const isGrayScale = computed((condition) => {
-  return condition ? 'grayscale' : 'grayscale-0'
-})
 onMounted(() => {
   memoryStore.getAllPhotos()
 })
+
+const reload = () => {
+  mistakes.value = 0
+  successes.value = 0
+  turnReset()
+  console.log('reload')
+}
 </script>
 
 <template>
-  <header class="text-center my-10 ml-12">
-    <div>Succeses: {{ successes }}</div>
-    <div>Errors: {{ mistakes }}</div>
-    <div>cards: {{ cardFliped }}</div>
+  <header class="text-center my-10 ml-12 h-10">
+    <div class="container mx-auto w-1/3 flex justify-center mb-6 border-4">
+      <div class="mx-2 text-green-500" :class="isSuccess ? 'text-xl font-bold' : ' '">
+        <p>Succeses: {{ successes }}</p>
+      </div>
+      <div class="mx-2 text-red-500" :class="isError ? 'text-xl font-bold' : ' '">
+        <p>Errors: {{ mistakes }}</p>
+      </div>
+      <div class="mx-2 text-blue-500">
+        <p>
+          Jugador: <strong>{{ name }}</strong>
+        </p>
+      </div>
+    </div>
   </header>
-  <main>
-    <section class="container mx-auto">
+  <main class="mt-7">
+    <section class="container mx-auto border-4 border-blue-500 p-2 rounded-lg">
       <div
-        class="grid grid-cols-3 gap-3 sm:grid-cols-3 sm:gap-5 md:grid-cols-6 md:gap-3 lg:grid-cols-6 lg:gap-7"
+        class="grid grid-cols-3 gap-3 sm:grid-cols-3 sm:gap-5 md:grid-cols-6 md:gap-3 lg:grid-cols-6 lg:gap-7 transition duration-300 ease-in-out pa-5"
       >
         <div
           v-for="(card, i) in cardsData"
           :key="i"
           @click="switchCard(card, i)"
-          class="2xl:size-60 xl:size-40 lg:size-36 md:size-24 sm:size-44 size-44 bg-gradient-to-r from-cyan-500 to-blue-500"
+          class="rounded-lg shadow-lg 2xl:size-60 xl:size-40 lg:size-36 md:size-24 sm:size-44 size-44 bg-gradient-to-r from-cyan-500 to-blue-500"
         >
           <div class="flex justify-center mt-8" v-if="card.isHidden" id="card__hidden">
-            <img src="../assets/img/icon_question.svg" alt="question-mark" class="text-white w-1/3 pt-0 md:pt-5" />
+            <img
+              src="../assets/img/icon_question.svg"
+              alt="question-mark"
+              class="text-white w-1/3 pt-0 md:pt-5"
+            />
           </div>
           <div
-            class="h-full w-full"
+            class="h-full w-full rounded-lg"
             v-else-if="card.hasBeenMatched || card.isHidden == false"
             id="card__revealed"
-            :class="isGrayScale(card.hasBeenMatched)"
+            :class="card.hasBeenMatched ? 'grayscale ' : 'grayscale-0'"
           >
             <img
               :src="card.fields.image.url"
@@ -169,5 +187,14 @@ onMounted(() => {
         </div>
       </div>
     </section>
+    <div class="flex justify-center mt-10">
+      <button
+        @click="reload"
+        type="reload"
+        class="flex justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+      >
+        Reiniciar
+      </button>
+    </div>
   </main>
 </template>
