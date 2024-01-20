@@ -5,27 +5,31 @@ import { apiPhotos } from '../config/axios/apiPhotos.axios'
 export const useMemoryStore = defineStore('memory', () => {
   const mistakes = ref(0)
   const successes = ref(0)
-  const cardsData = ref()
+  const cardsData = ref([])
   const level = ref({
-    time: 1000,
+    name: 'medio',
     cards: 9,
-    name: 'hard'
+    time: 1700,
+    countdown: 920
   })
   const levels = [
     {
-      name: 'easy',
+      name: 'fácil',
       cards: 6,
-      time: 2500
+      time: 2500,
+      countdown: 180
     },
     {
-      name: 'medium',
+      name: 'medio',
       cards: 9,
-      time: 1700
+      time: 1700,
+      countdown: 120
     },
     {
-      name: 'hard',
+      name: 'dificil',
       cards: 9,
-      time: 1000
+      time: 1000,
+      countdown: 60
     }
   ]
   const getAllPhotos = async () => {
@@ -38,7 +42,7 @@ export const useMemoryStore = defineStore('memory', () => {
       cardsData.value = arrayData.map((card) => {
         return {
           ...card,
-          isHidden: true,
+          isFlipped: false,
           hasBeenMatched: false,
           id: id++
         }

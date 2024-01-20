@@ -1,8 +1,10 @@
 <script setup>
-import { ref, onMounted, watch, computed } from 'vue'
+import { ref, onMounted, watch, proxyRefs } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useMemoryStore } from '@/stores/memory'
 import { useUserStore } from '@/stores/user'
+import TheCountdown from '@/components/TheCountdown.vue';
+import router from '@/router';
 
 const memoryStore = useMemoryStore()
 const userStore = useUserStore()
@@ -16,6 +18,7 @@ const cardFliped = ref(0)
 const firstCardFliped = ref(undefined)
 const secondCardFliped = ref(undefined)
 const levelSelected = ref({})
+const cardsRef = ref([]);
 
 watch(successes, () => {
   if (successes.value === 9) {
@@ -30,72 +33,55 @@ const turnReset = () => {
   firstCardFliped.value = undefined
   secondCardFliped.value = undefined
   cardsData.value.forEach((card) => {
-    if (card.isHidden === false && card.hasBeenMatched === false) {
-      card.isHidden = true
-    } else {
-      return
+    if (card.isFlipped === true && card.hasBeenMatched === false) {
+      card.isFlipped = false
     }
   })
   console.log(cardsData.value)
 }
 
 const switchCard = (card) => {
-  if (cardFliped.value === 2) {
-    if (card.id === firstCardFliped.value.id || card.id === secondCardFliped.value.id) {
-      console.log('debes clickear otra carta')
-    } else {
-      // turnReset()
-      // set card clicked to visible
-      cardFliped.value++
-      let choosenCard = cardsData.value.find((c) => c.id === card.id)
-      choosenCard.isHidden = false
-      firstCardFliped.value = choosenCard
-    }
-  } else if (cardFliped.value === 0) {
+  if (cardFliped.value === 0) {
     if (card.id == firstCardFliped?.value?.id) {
       alert('debes escoger otra carta')
     } else {
       cardFliped.value++
       let choosenCard = cardsData.value.find((c) => c.id === card.id)
-      choosenCard.isHidden = false
+      choosenCard.isFlipped = true
       firstCardFliped.value = choosenCard
-      console.log(
-        `estado 2do if: fliped:${cardFliped.value} - 1st:${firstCardFliped.value.meta.name} - 2nd:${secondCardFliped.value?.meta?.name}`
-      )
     }
   } else if (cardFliped.value === 1) {
-    cardFliped.value++
-    let secondChoosenCard = cardsData.value.find((c) => c.id === card.id)
-    secondChoosenCard.isHidden = false
-    secondCardFliped.value = secondChoosenCard
-    console.log(
-      `estado 3er IF: fliped:${cardFliped.value} - 1st:${firstCardFliped.value.meta.name} - 2nd:${secondCardFliped.value.meta.name}`
-    )
-
-    // logic for match cards
-    let firstId = firstCardFliped.value.meta.uuid
-    let secondId = secondCardFliped.value?.meta?.uuid
-    console.log('ids:', firstId, secondId)
-    const isMatch = compareCards(firstId, secondId)
-
-    if (isMatch) {
-      console.log(`YES checo P1: ${isMatch}`)
-      successes.value++
-      isSuccess.value = true
-      setTimeout((e) => {
-        isSuccess.value = false
-        manageSuccess(firstCardFliped.value, secondCardFliped.value)
-      }, level.value.time)
+    if (card.id == firstCardFliped?.value?.id) {
+      alert('debes escoger otra carta')
     } else {
-      console.log('nones siga participando')
-      mistakes.value++
-      isError.value = true
-      setTimeout((e) => {
-        isError.value = false
-        console.log(e)
-        turnReset()
-        console.warn('ejecute turnReset()')
-      }, level.value.time)
+      cardFliped.value++
+      let secondChoosenCard = cardsData.value.find((c) => c.id === card.id)
+      secondChoosenCard.isFlipped = true
+      secondCardFliped.value = secondChoosenCard
+
+      // logic for match cards
+      let firstId = firstCardFliped.value.meta.uuid
+      let secondId = secondCardFliped.value?.meta?.uuid
+      const isMatch = compareCards(firstId, secondId)
+      console.log('ids:', firstId, secondId)
+      console.log('son match? ', isMatch)
+      if (isMatch) {
+        successes.value++
+        isSuccess.value = true
+        setTimeout((e) => {
+          isSuccess.value = false
+          manageSuccess(firstCardFliped.value, secondCardFliped.value)
+        }, level.value.time)
+      } else {
+        console.log('nones siga participando')
+        mistakes.value++
+        isError.value = true
+        setTimeout((e) => {
+          isError.value = false
+          turnReset()
+          console.warn('ejecute turnReset()')
+        }, level.value.time)
+      }
     }
   }
 }
@@ -106,16 +92,11 @@ const compareCards = (firstId, secondId) => {
   } else false
 }
 
-// const manageMistake = () => {
-//   cardFliped.value = 0
-//   firstCardFliped.value = undefined
-//   secondCardFliped.value = undefined
-//   cardsData.value.forEach((card) => {
-//     card.isHidden = true
-//   })
-//   console.log(
-//     `estado turnReset: fliped:${cardFliped.value} - 1st:${firstCardFliped.value} - 2nd:${secondCardFliped.value}`
-//   )
+// const manageMistake = (first, second) => {
+//   // cardFliped.value = 0
+//   // firstCardFliped.value = undefined
+//   // secondCardFliped.value = undefined
+
 // }
 
 const manageSuccess = (firstCard, secondCard) => {
@@ -126,75 +107,126 @@ const manageSuccess = (firstCard, secondCard) => {
   cardFliped.value = 0
 }
 
+memoryStore.getAllPhotos()
 onMounted(() => {
-  memoryStore.getAllPhotos()
+
 })
 
-const reload = () => {
+const restart = () => {
   mistakes.value = 0
   successes.value = 0
+  cardsData.value.forEach((card) => {
+    card.hasBeenMatched = false
+  })
   turnReset()
   console.log('reload')
+}
+
+const yafue = () => { alert('erai ctm') }
+const back = () => {
+  router.push('/')
 }
 </script>
 
 <template>
-  <header class="text-center my-10 ml-12 h-10">
+  <header class="text-center my-7 ml-12 h-10">
+    <div>
+      <TheCountdown :time="level.countdown" @gameover="yafue" />
+    </div>
     <div class="container mx-auto w-1/3 flex justify-center mb-6 border-4">
       <div class="mx-2 text-green-500" :class="isSuccess ? 'text-xl font-bold' : ' '">
-        <p>Succeses: {{ successes }}</p>
+        <p>Aciertos: {{ successes }}</p>
       </div>
       <div class="mx-2 text-red-500" :class="isError ? 'text-xl font-bold' : ' '">
-        <p>Errors: {{ mistakes }}</p>
+        <p>Errores: {{ mistakes }}</p>
       </div>
       <div class="mx-2 text-blue-500">
         <p>
           Jugador: <strong>{{ name }}</strong>
         </p>
       </div>
+      <div class="mx-2 text-blue-500">
+        <p>
+          Nivel: <strong>{{ level.name }}</strong>
+        </p>
+      </div>
     </div>
   </header>
-  <main class="mt-7">
-    <section class="container mx-auto border-4 border-blue-500 p-2 rounded-lg">
+  <main class="">
+    <div class="flex justify-start ml-10 pl-10 my-10 -mt-10">
+      <button @click="back" type="reload"
+        class="flex justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+        <span class="material-icons">fast_rewind</span>
+      </button>
+    </div>
+    <section class="container mx-auto border-4 border-blue-500 p-2 rounded-lg h-max">
       <div
-        class="grid grid-cols-3 gap-3 sm:grid-cols-3 sm:gap-5 md:grid-cols-6 md:gap-3 lg:grid-cols-6 lg:gap-7 transition duration-300 ease-in-out pa-5"
-      >
-        <div
-          v-for="(card, i) in cardsData"
-          :key="i"
-          @click="switchCard(card, i)"
-          class="rounded-lg shadow-lg 2xl:size-60 xl:size-40 lg:size-36 md:size-24 sm:size-44 size-44 bg-gradient-to-r from-cyan-500 to-blue-500"
-        >
-          <div class="flex justify-center mt-8" v-if="card.isHidden" id="card__hidden">
-            <img
-              src="../assets/img/icon_question.svg"
-              alt="question-mark"
-              class="text-white w-1/3 pt-0 md:pt-5"
-            />
-          </div>
-          <div
-            class="h-full w-full rounded-lg"
-            v-else-if="card.hasBeenMatched || card.isHidden == false"
-            id="card__revealed"
-            :class="card.hasBeenMatched ? 'grayscale ' : 'grayscale-0'"
-          >
-            <img
-              :src="card.fields.image.url"
-              alt="image-card"
-              class="object-cover object-center h-full w-full"
-            />
+        class="grid grid-cols-3 gap-3 sm:grid-cols-3 sm:gap-5 md:grid-cols-6 md:gap-3 lg:grid-cols-6 lg:gap-7 transition duration-300 ease-in-out pa-5">
+        <div class="card-container" @click="switchCard(card, i)" v-for="(card, i) in cardsData" :key="i">
+
+          <div class="card" :class="{ 'flipped': card.isFlipped }">
+            <!-- {{ card?.meta?.name ?? 'a' }} -->
+            <div class="card-face front">
+              <img src="../assets/img/icon_question.svg" alt="question-mark" height="20px" class="m-10" />
+            </div>
+            <div class="card-face back">
+              <img :src="card.fields.image.url" alt="" class="object-cover object-center h-full w-full rounded-lg">
+            </div>
           </div>
         </div>
+
       </div>
     </section>
+
     <div class="flex justify-center mt-10">
-      <button
-        @click="reload"
-        type="reload"
-        class="flex justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-      >
+      <button @click="restart" type="reload"
+        class="flex justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
         Reiniciar
       </button>
     </div>
+    <div>
+
+    </div>
   </main>
 </template>
+<style scoped>
+.card-container {
+  perspective: 1000px;
+}
+
+.card {
+  width: 11rem;
+  height: 12rem;
+  transform-style: preserve-3d;
+  transition: transform 0.5s;
+
+}
+
+.flipped {
+  transform: rotateY(180deg);
+}
+
+.card-face {
+  border-radius: 20px;
+  position: absolute;
+  background-image: linear-gradient(to right, var(--tw-gradient-stops));
+  --tw-gradient-from: #3b82f6 var(--tw-gradient-from-position);
+  --tw-gradient-to: rgb(1, 223, 212) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.front {
+  transform: rotateY(0deg);
+}
+
+.back {
+  transform: rotateY(180deg);
+}
+</style>
