@@ -201,7 +201,7 @@ const manageRestart = ()=>{
         >
           <div
             class="card xl:w-44 xl:h-48 lg:w-40 lg:h-44 md:w-28 md:h-32 w-24 h-24"
-            :class="{ flipped: !card.isFlipped }"
+            :class="{ flipped: card.isFlipped }"
           >
             <div class="card-face front">
               <img src="../assets/img/icon_question.svg" alt="question-mark" class="m-10 w-full" />

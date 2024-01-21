@@ -11,7 +11,7 @@ export const useMemoryStore = defineStore('memory', () => {
     value: 'medium',
     cards: 9,
     time: 1700,
-    countdown: 5
+    countdown: 120
   })
   const levels = [
     {
