@@ -1,14 +1,17 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 
-export const useUserStore = defineStore('user',() => {
-    const name = ref('Player')
+export const useUserStore = defineStore(
+  'user',
+  () => {
+    const playerName = ref('')
+    const haveName = ref(false)
     const dificult = ref({})
     const setName = (inputName) => {
-      name.value = inputName
-      console.log('nombre :', inputName)
+      playerName.value = inputName
+      haveName.value = true
     }
-    return { name, setName, dificult }
+    return { playerName, setName, haveName, dificult }
   },
   { persist: true }
 )

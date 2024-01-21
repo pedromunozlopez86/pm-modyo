@@ -16,14 +16,11 @@ const countdown = computed(() => {
 let interval;
 
 const startCountdown = () => {
-
-    console.log('aaaa')
     interval = setInterval(() => {
         if (timeRemaining.value > 0) {
             timeRemaining.value--;
         } else {
             clearInterval(interval);
-            console.log('¡Tiempo agotado!');
             emit('gameover')
         }
     }, 1000);

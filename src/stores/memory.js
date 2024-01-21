@@ -39,10 +39,8 @@ export const useMemoryStore = defineStore('memory', () => {
   const getAllPhotos = async () => {
     try {
       const { data } = await apiPhotos.get('', { params: { per_page: level.value.cards } })
-      // duplicates the cards to get the matches
       let arrayData = [...data.entries, ...data.entries]
       let id = 0
-      // set array with properties for the game
       cardsData.value = arrayData.map((card) => {
         return {
           ...card,
@@ -51,14 +49,12 @@ export const useMemoryStore = defineStore('memory', () => {
           id: id++
         }
       })
-      // random order photos
       randomizePhotos(cardsData.value)
-      // console.log(cardsData.value)
     } catch (error) {
       console.error(error)
     }
   }
-  // function to randomize the photos on start
+
   const randomizePhotos = (photos) => {
     function random() {
       return Math.random() - 0.5
@@ -68,18 +64,15 @@ export const useMemoryStore = defineStore('memory', () => {
 
   const manageMistakes = () => {
     mistakes.value++
-    console.log('A mistake has been ocurred')
   }
 
   const manageSuccesses = () => {
     successes.value++
-    console.log('A success has been ocurred')
   }
 
   const restartGame = () => {
     mistakes.value = 0
     successes.value = 0
-    console.log('the game has been restarted!')
   }
 
   const setLevel = (levelSelected) => {

@@ -10,7 +10,7 @@ import TheDialog from '@/components/TheDialog.vue'
 const memoryStore = useMemoryStore()
 const userStore = useUserStore()
 const { cardsData, mistakes, successes, level } = storeToRefs(memoryStore)
-const { name } = storeToRefs(userStore)
+const { playerName } = storeToRefs(userStore)
 
 const isError = ref(false)
 const isSuccess = ref(false)
@@ -70,8 +70,6 @@ const switchCard = (card) => {
       let firstId = firstCardFliped.value.meta.uuid
       let secondId = secondCardFliped.value?.meta?.uuid
       const isMatch = compareCards(firstId, secondId)
-      console.log('ids:', firstId, secondId)
-      console.log('son match? ', isMatch)
       if (isMatch) {
         successes.value++
         isSuccess.value = true
@@ -102,7 +100,6 @@ const manageSuccess = (firstCard, secondCard) => {
   // set cards state as NotHidden
   cardsData.value.find((c) => c.id === firstCard.id).hasBeenMatched = true
   cardsData.value.find((c) => c.id === secondCard.id).hasBeenMatched = true
-  console.log(cardsData.value)
   cardFliped.value = 0
 }
 
@@ -118,7 +115,6 @@ const restart = () => {
   })
   turnReset()
   clockComponent.value.resetTime()
-  console.log('reload')
   isTimeout.value = false
 }
 
@@ -129,10 +125,14 @@ const timeOut = () => {
 }
 const back = () => {
   router.push('/')
+  restart()
 }
 
 const manageRestart = ()=>{
-  console.log('restart')
+  console.log(' aca debe restart')
+setTimeout(()=>{
+  console.log('se recarga pag')
+},1000)
 }
 </script>
 
@@ -174,7 +174,7 @@ const manageRestart = ()=>{
         </div>
         <div class="mx-2 text-blue-500 text-md md:text-xl">
           <p>
-            Jugador: <strong>{{ name }}</strong>
+            Jugador: <strong>{{ playerName }}</strong>
           </p>
         </div>
         <div class="mx-2 text-blue-500 text-md md:text-xl">
