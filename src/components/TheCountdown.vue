@@ -1,11 +1,12 @@
 <script setup>
-import { onMounted, computed, defineProps, ref, defineExpose } from 'vue'
+import { onMounted, computed, defineProps, ref, defineExpose,defineEmits } from 'vue'
 
 const countdownProps = defineProps({
     time: 60
 })
 const timeRemaining = ref(countdownProps.time);
 
+const emit = defineEmits(["gameover"])
 const countdown = computed(() => {
     const minutes = Math.floor(timeRemaining.value / 60)
     const seconds = timeRemaining.value % 60
@@ -40,7 +41,7 @@ defineExpose({ resetTime });
 
 <template>
     <div class="container mx-auto text-center">
-        <h1 class="text-2xl text-blue-600 font-bold shadow-3">{{ countdown }}</h1>
+        <h1 class=" text-md md:pt-0 pt-9 pr-3 md:pr-0 md:text-2xl  text-blue-600 font-bold  drop-shadow-lg">TIEMPO: {{ countdown }}</h1>
     </div>
 </template>
   

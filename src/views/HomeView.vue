@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch, defineProps } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useMemoryStore } from '@/stores/memory'
 import { useUserStore } from '@/stores/user'
@@ -18,14 +18,15 @@ const launchModal = ref(false)
 const cardFliped = ref(0)
 const firstCardFliped = ref(undefined)
 const secondCardFliped = ref(undefined)
+const isTimeout = ref(false)
 
 const clockComponent = ref()
 
 watch(successes, () => {
   if (successes.value === 9) {
     setTimeout(() => {
-      // alert(`Has ganado: ${name.value}!!`)
       modal()
+      restart()
     }, 500)
     return false
   }
@@ -117,67 +118,73 @@ const restart = () => {
   cardsData.value.forEach((card) => {
     card.hasBeenMatched = false
   })
+  isTimeout.value = false
+
   turnReset()
   clockComponent.value.resetTime()
 
   console.log('reload')
 }
 
-const yafue = () => { alert('erai ctm') }
+const timeOut = () => {
+  isTimeout.value = true
+  // restart()
+
+}
 const back = () => {
   router.push('/')
-}
-
-const reloj = () => {
-  console.log(clockComponent.value)
-  clockComponent.value.resetTime()
 }
 
 </script>
 
 <template>
-  <header class="text-center my-7 ml-12 h-10">
-    <div>
-      <TheCountdown :time="level.countdown" @gameover="yafue" ref="clockComponent" />
-    </div>
-    <div class="container mx-auto w-1/3 flex justify-center mb-6 border-4">
-      <div class="mx-2 text-green-500" :class="isSuccess ? 'text-xl font-bold' : ' '">
-        <p>Aciertos: {{ successes }}</p>
+  <header class="text-center mt-2 h-auto w-full ">
+    <div class="container mx-auto w-full flex justify-around mb-6 border-4 drop-shadow-sm bg-gray-100 py-3">
+      <div id="header__buttons" class=" ">
+        <div class="flex justify-start pt-10 md:pt-0">
+          <button @click="back" type="reload"
+            class="flex justify-center rounded-md bg-blue-400 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+            <span class="material-icons">fast_rewind</span>
+          </button>
+          <button @click="restart" type="reload"
+            class="flex justify-center rounded-md bg-blue-400 ml-3 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+            <span class="material-icons">replay</span>
+          </button>
+        </div>
       </div>
-      <div class="mx-2 text-red-500" :class="isError ? 'text-xl font-bold' : ' '">
-        <p>Errores: {{ mistakes }}</p>
+      <div id="header__scoreboard" class="flex flex-wrap justify-center">
+        <div class="mx-2 text-green-500  text-md md:text-xl" :class="isSuccess ? 'text-xl font-bold' : ' '">
+          <p>Aciertos: {{ successes }}</p>
+        </div>
+        <div class="mx-2 text-red-500 text-md md:text-xl" :class="isError ? 'text-xl font-bold' : ' '">
+          <p>Errores: {{ mistakes }}</p>
+        </div>
+        <div class="mx-2 text-blue-500 text-md md:text-xl">
+          <p>
+            Jugador: <strong>{{ name }}</strong>
+          </p>
+        </div>
+        <div class="mx-2 text-blue-500 text-md md:text-xl">
+          <p>
+            Nivel: <strong>{{ level.name }}</strong>
+          </p>
+        </div>
       </div>
-      <div class="mx-2 text-blue-500">
-        <p>
-          Jugador: <strong>{{ name }}</strong>
-        </p>
-      </div>
-      <div class="mx-2 text-blue-500">
-        <p>
-          Nivel: <strong>{{ level.name }}</strong>
-        </p>
+      <div>
+        <TheCountdown :time="level.countdown" @gameover="timeOut" ref="clockComponent" />
       </div>
     </div>
   </header>
-  <main class="">
-    <div class="flex justify-start ml-10 pl-10 my-10 -mt-10">
-      <button @click="back" type="reload"
-        class="flex justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-        <span class="material-icons">fast_rewind</span>
-      </button>
-      <button @click="restart" type="reload"
-        class="flex justify-center rounded-md bg-indigo-600 ml-3 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-        <span class="material-icons">replay</span>
-      </button>
-    </div>
-    <section class="container mx-auto border-4 border-blue-500 p-2 rounded-lg h-max">
+  <main class="container mx-auto">
+    <section class=" border-blue-500 p-2 rounded-lg h-max">
       <div
         class="grid grid-cols-3 gap-3 sm:grid-cols-3 sm:gap-5 md:grid-cols-6 md:gap-3 lg:grid-cols-6 lg:gap-7 transition duration-300 ease-in-out pa-5">
         <div class="card-container" @click="switchCard(card, i)" v-for="(card, i) in cardsData" :key="i">
 
-          <div class="card" :class="{ 'flipped': !card.isFlipped }">
+          <div class="card xl:w-44 xl:h-48 lg:w-40 lg:h-44 md:w-28 md:h-32 w-24 h-24"
+            :class="{ 'flipped': card.isFlipped }">
             <div class="card-face front">
-              <img src="../assets/img/icon_question.svg" alt="question-mark" height="20px" class="m-10" />
+              <img src="../assets/img/icon_question.svg" alt="question-mark" class="m-10 w-full" />
             </div>
             <div class="card-face back">
               <img :src="card.fields.image.url" alt="" class="object-cover object-center h-full w-full rounded-lg">
@@ -187,7 +194,8 @@ const reloj = () => {
       </div>
     </section>
     <div>
-      <TheDialog :openModal="launchModal" :playerName="name" :level="level.name" />
+      <TheDialog :openModal="launchModal" :playerName="name" :level="level.name" :isTimeout="isTimeout"
+        @closeModal="restart" />
     </div>
   </main>
 </template>
@@ -197,8 +205,8 @@ const reloj = () => {
 }
 
 .card {
-  width: 11rem;
-  height: 12rem;
+  /* width: 11rem; */
+  /* height: 12rem; */
   transform-style: preserve-3d;
   transition: transform 0.5s;
 

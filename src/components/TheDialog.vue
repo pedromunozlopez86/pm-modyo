@@ -1,13 +1,15 @@
 <script setup>
-import { ref, defineProps, watch } from 'vue'
+import { ref, defineProps,defineEmits, watch } from 'vue'
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
-import { } from '@heroicons/vue/24/outline'
 
 const props = defineProps({
     openModal: Boolean,
+    isTimeout:Boolean,
     playerName: String,
-    level: String
+    level: String,
 })
+
+const emits = defineEmits(['closeModal'])
 const open = ref(props.openModal)
 watch(props, () => {
     open.value = !open.value
@@ -44,11 +46,18 @@ watch(props, () => {
 
 
                                     </div>
-                                    <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                                    <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left" v-if="!props.isTimeout">
                                         <DialogTitle as="h3" class="text-base font-semibold leading-6 text-gray-900">
                                             Felicitaciones! {{ props.playerName }}</DialogTitle>
                                         <div class="mt-2">
-                                            <p class="text-sm text-gray-500">Haz completado el juego en modo: {{ props.level }}!</p>
+                                            <p class="text-sm text-gray-500">¡Has completado el juego en modo: {{ props.level }}!</p>
+                                        </div>
+                                    </div>
+                                    <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left" v-else>
+                                        <DialogTitle as="h3" class="text-base font-semibold leading-6 text-gray-900">
+                                           Hey!, {{ props.playerName }}</DialogTitle>
+                                        <div class="mt-2">
+                                            <p class="text-sm text-gray-500">¡Tu tiempo se ha agotado, vuelve a intentarlo o baja la dificultad!</p>
                                         </div>
                                     </div>
 
@@ -57,7 +66,7 @@ watch(props, () => {
                             <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                                 <button type="button"
                                     class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
-                                    @click="open = false" ref="cancelButtonRef">Cerrar</button>
+                                    @click="open = false,$emit('closeModal')" ref="cancelButtonRef">Cerrar</button>
                             </div>
                         </DialogPanel>
                     </TransitionChild>

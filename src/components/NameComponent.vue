@@ -3,14 +3,13 @@ import { ref, onMounted } from 'vue'
 import router from '@/router'
 import { useUserStore } from '../stores/user'
 import { useMemoryStore } from '../stores/memory'
-import { storeToRefs } from 'pinia';
+import { storeToRefs } from 'pinia'
 
 const userStore = useUserStore()
 const memoryStore = useMemoryStore()
-const { name } = storeToRefs(userStore)
 const inputName = ref('')
-const levelSelected = ref()
-
+const levelSelected = ref('medium')
+const name = storeToRefs(userStore)
 
 const start = () => {
   userStore.setName(inputName.value)

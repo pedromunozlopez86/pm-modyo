@@ -11,7 +11,7 @@ export const useMemoryStore = defineStore('memory', () => {
     value: 'medium',
     cards: 9,
     time: 1700,
-    countdown: 120
+    countdown: 5
   })
   const levels = [
     {
@@ -33,7 +33,7 @@ export const useMemoryStore = defineStore('memory', () => {
       value: 'hard',
       cards: 9,
       time: 1000,
-      countdown: 60
+      countdown: 5
     }
   ]
   const getAllPhotos = async () => {

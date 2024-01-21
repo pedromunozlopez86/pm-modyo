@@ -1,5 +1,5 @@
 <script setup>
-import { ref, defineProps, defineEmits, onUpdated } from 'vue'
+import { ref, defineProps, defineEmits } from 'vue'
 
 const isFlipped = ref(false)
 const cardProps = defineProps({
