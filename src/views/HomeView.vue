@@ -23,7 +23,8 @@ const isTimeout = ref(false)
 const clockComponent = ref()
 
 watch(successes, () => {
-  if (successes.value === 9) {
+
+  if (successes.value === level.value.cards) {
     setTimeout(() => {
       modal()
       restart()
@@ -79,7 +80,6 @@ const switchCard = (card) => {
           manageSuccess(firstCardFliped.value, secondCardFliped.value)
         }, level.value.time)
       } else {
-        console.log('nones siga participando')
         mistakes.value++
         isError.value = true
         setTimeout((e) => {
