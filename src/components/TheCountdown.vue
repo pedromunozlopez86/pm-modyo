@@ -1,16 +1,9 @@
 <script setup>
-import { onMounted, computed, defineProps,ref, defineEmits } from 'vue'
-
+import { onMounted, computed, defineProps, ref, defineExpose } from 'vue'
 
 const countdownProps = defineProps({
     time: 60
 })
-const emit = defineEmits({
-    gameover : ()=>{
-        console.log('desde emit te aviso que fuiste bueno')
-    }
-})
-console.log(countdownProps.time)
 const timeRemaining = ref(countdownProps.time);
 
 const countdown = computed(() => {
@@ -22,6 +15,8 @@ const countdown = computed(() => {
 let interval;
 
 const startCountdown = () => {
+
+    console.log('aaaa')
     interval = setInterval(() => {
         if (timeRemaining.value > 0) {
             timeRemaining.value--;
@@ -33,9 +28,13 @@ const startCountdown = () => {
     }, 1000);
 }
 
+const resetTime = () => {
+    timeRemaining.value = countdownProps.time
+}
 onMounted(() => {
     startCountdown()
 })
+defineExpose({ resetTime });
 </script>
 
 

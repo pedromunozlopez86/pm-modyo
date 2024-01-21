@@ -1,33 +1,39 @@
 <script setup>
-import { ref, onMounted, watch, proxyRefs } from 'vue'
+import { ref, onMounted, watch, defineProps } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useMemoryStore } from '@/stores/memory'
 import { useUserStore } from '@/stores/user'
 import TheCountdown from '@/components/TheCountdown.vue';
 import router from '@/router';
+import TheDialog from '@/components/TheDialog.vue';
 
 const memoryStore = useMemoryStore()
 const userStore = useUserStore()
 const { cardsData, mistakes, successes, level } = storeToRefs(memoryStore)
-const { levels } = useMemoryStore()
 const { name } = storeToRefs(userStore)
 
 const isError = ref(false)
 const isSuccess = ref(false)
+const launchModal = ref(false)
 const cardFliped = ref(0)
 const firstCardFliped = ref(undefined)
 const secondCardFliped = ref(undefined)
-const levelSelected = ref({})
-const cardsRef = ref([]);
+
+const clockComponent = ref()
 
 watch(successes, () => {
   if (successes.value === 9) {
     setTimeout(() => {
-      alert(`Has ganado: ${name.value}!!`)
+      // alert(`Has ganado: ${name.value}!!`)
+      modal()
     }, 500)
     return false
   }
 })
+
+const modal = () => {
+  launchModal.value = !launchModal.value
+}
 const turnReset = () => {
   cardFliped.value = 0
   firstCardFliped.value = undefined
@@ -37,7 +43,6 @@ const turnReset = () => {
       card.isFlipped = false
     }
   })
-  console.log(cardsData.value)
 }
 
 const switchCard = (card) => {
@@ -92,12 +97,6 @@ const compareCards = (firstId, secondId) => {
   } else false
 }
 
-// const manageMistake = (first, second) => {
-//   // cardFliped.value = 0
-//   // firstCardFliped.value = undefined
-//   // secondCardFliped.value = undefined
-
-// }
 
 const manageSuccess = (firstCard, secondCard) => {
   // set cards state as NotHidden
@@ -107,8 +106,8 @@ const manageSuccess = (firstCard, secondCard) => {
   cardFliped.value = 0
 }
 
-memoryStore.getAllPhotos()
 onMounted(() => {
+  memoryStore.getAllPhotos()
 
 })
 
@@ -119,6 +118,8 @@ const restart = () => {
     card.hasBeenMatched = false
   })
   turnReset()
+  clockComponent.value.resetTime()
+
   console.log('reload')
 }
 
@@ -126,12 +127,18 @@ const yafue = () => { alert('erai ctm') }
 const back = () => {
   router.push('/')
 }
+
+const reloj = () => {
+  console.log(clockComponent.value)
+  clockComponent.value.resetTime()
+}
+
 </script>
 
 <template>
   <header class="text-center my-7 ml-12 h-10">
     <div>
-      <TheCountdown :time="level.countdown" @gameover="yafue" />
+      <TheCountdown :time="level.countdown" @gameover="yafue" ref="clockComponent" />
     </div>
     <div class="container mx-auto w-1/3 flex justify-center mb-6 border-4">
       <div class="mx-2 text-green-500" :class="isSuccess ? 'text-xl font-bold' : ' '">
@@ -158,14 +165,17 @@ const back = () => {
         class="flex justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
         <span class="material-icons">fast_rewind</span>
       </button>
+      <button @click="restart" type="reload"
+        class="flex justify-center rounded-md bg-indigo-600 ml-3 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+        <span class="material-icons">replay</span>
+      </button>
     </div>
     <section class="container mx-auto border-4 border-blue-500 p-2 rounded-lg h-max">
       <div
         class="grid grid-cols-3 gap-3 sm:grid-cols-3 sm:gap-5 md:grid-cols-6 md:gap-3 lg:grid-cols-6 lg:gap-7 transition duration-300 ease-in-out pa-5">
         <div class="card-container" @click="switchCard(card, i)" v-for="(card, i) in cardsData" :key="i">
 
-          <div class="card" :class="{ 'flipped': card.isFlipped }">
-            <!-- {{ card?.meta?.name ?? 'a' }} -->
+          <div class="card" :class="{ 'flipped': !card.isFlipped }">
             <div class="card-face front">
               <img src="../assets/img/icon_question.svg" alt="question-mark" height="20px" class="m-10" />
             </div>
@@ -174,18 +184,10 @@ const back = () => {
             </div>
           </div>
         </div>
-
       </div>
     </section>
-
-    <div class="flex justify-center mt-10">
-      <button @click="restart" type="reload"
-        class="flex justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-        Reiniciar
-      </button>
-    </div>
     <div>
-
+      <TheDialog :openModal="launchModal" :playerName="name" :level="level.name" />
     </div>
   </main>
 </template>

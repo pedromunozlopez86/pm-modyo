@@ -7,26 +7,30 @@ export const useMemoryStore = defineStore('memory', () => {
   const successes = ref(0)
   const cardsData = ref([])
   const level = ref({
-    name: 'medio',
+    name: 'Medio',
+    value: 'medium',
     cards: 9,
     time: 1700,
-    countdown: 920
+    countdown: 120
   })
   const levels = [
     {
-      name: 'fácil',
+      name: 'Fácil',
+      value: 'easy',
       cards: 6,
       time: 2500,
       countdown: 180
     },
     {
-      name: 'medio',
+      name: 'Medio',
+      value: 'medium',
       cards: 9,
       time: 1700,
       countdown: 120
     },
     {
-      name: 'dificil',
+      name: 'Dificil',
+      value: 'hard',
       cards: 9,
       time: 1000,
       countdown: 60
@@ -79,8 +83,7 @@ export const useMemoryStore = defineStore('memory', () => {
   }
 
   const setLevel = (levelSelected) => {
-    level.value = levelSelected
-    console.log(typeof levelSelected)
+    level.value = levels.find((l) => l.value === levelSelected)
     getAllPhotos()
   }
 
