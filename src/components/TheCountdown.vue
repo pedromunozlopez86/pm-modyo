@@ -35,7 +35,7 @@ const resetTime = () => {
 onMounted(() => {
     startCountdown()
 })
-defineExpose({ resetTime });
+defineExpose({ resetTime,startCountdown });
 </script>
 
 

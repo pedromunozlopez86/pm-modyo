@@ -14,6 +14,10 @@ const open = ref(props.openModal)
 watch(props, () => {
     open.value = !open.value
 })
+
+// watchEffect(()=>{
+//     console.log(props.isTimeout)
+// })
 </script>
 <template>
     <TransitionRoot as="template" :show="open">
