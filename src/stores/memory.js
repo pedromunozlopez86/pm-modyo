@@ -33,7 +33,7 @@ export const useMemoryStore = defineStore('memory', () => {
       value: 'hard',
       cards: 9,
       time: 1000,
-      countdown: 5
+      countdown: 60
     }
   ]
   const getAllPhotos = async () => {

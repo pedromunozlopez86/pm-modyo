@@ -9,7 +9,7 @@ const emits = defineEmits(["onFlipCard"])
 
 const flipCard = () => {
     isFlipped.value = !isFlipped.value
-    emits('onFlipCard',isFlipped.value)
+    emits('onFlipCard', isFlipped.value)
 }
 
 const resetCard = () => {
@@ -21,14 +21,12 @@ const resetCard = () => {
     <div class="card-container" @click="flipCard">
         {{ isFlipped }}
         <div class="card" :class="{ 'flipped': isFlipped }">
-            {{ card?.meta?.name ?? 'a' }}
             <div class="card-face front">
                 <img src="../assets/img/icon_question.svg" alt="question-mark" height="8rem" class="m-5" />
 
             </div>
-            <div class="card-face back">
-
-                <img :src="cardProps.card.fields.image.url" alt="">
+            <div class="card-face back grayscale ">
+                <img :src="cardProps.card.fields.image.url" alt="card-image" class="isMatch">
             </div>
         </div>
     </div>
@@ -74,5 +72,9 @@ const resetCard = () => {
 
 .back {
     transform: rotateY(180deg);
+}
+
+.isMatch {
+    filter: grayscale(1);
 }
 </style>
