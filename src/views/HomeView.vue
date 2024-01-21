@@ -119,10 +119,8 @@ const restart = () => {
     card.hasBeenMatched = false
   })
   isTimeout.value = false
-
   turnReset()
   clockComponent.value.resetTime()
-
   console.log('reload')
 }
 
