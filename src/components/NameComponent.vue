@@ -23,8 +23,8 @@ onMounted(() => {
 })
 </script>
 <template>
-  <div class="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8 bg-slate-200">
-
+  <div class="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8 bg-slate-200 text-center">
+    <h1 class="font-bold text-indigo-600 text-2xl">Juego de Memoria</h1>
     <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm container w-1/4 text-center">
       <form class="space-y-6" @submit.prevent="start">
         <div>
