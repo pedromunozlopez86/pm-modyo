@@ -10,32 +10,32 @@ This template should help get you started developing with Vue 3 in Vite.
 
 See [Vite Configuration Reference](https://vitejs.dev/config/).
 
+## Requirements
+
+```sh
+    node v20.11.0
+```
+```
+    yarn v4.0.2
+```
+
+
 ## Project Setup
 
 ```sh
-npm install
+yarn install
 ```
 
 ### Compile and Hot-Reload for Development
 
 ```sh
-npm run dev
+yarn dev
 ```
 
-### Compile and Minify for Production
+### Deployed on vercel
 
 ```sh
-npm run build
+https://pm-modyo.vercel.app
 ```
 
-### Run Unit Tests with [Vitest](https://vitest.dev/)
 
-```sh
-npm run test:unit
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
